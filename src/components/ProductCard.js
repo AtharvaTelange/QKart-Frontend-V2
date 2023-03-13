@@ -1,36 +1,36 @@
 import { AddShoppingCartOutlined } from "@mui/icons-material";
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Rating,
-  Typography,
-} from "@mui/material";
-import React from "react";
+import {Button,Card,CardActions,CardContent,CardMedia,CardActionArea,Rating,Typography,} from "@mui/material";import React from "react";
 import "./ProductCard.css";
 
 const ProductCard = ({ product, handleAddToCart }) => {
-  // console.log("product to be added to cart->", product)
+  const {name,cost,rating,image,_id}=product;
+// function pushToCart(e){
+//   console.log(e.target.value)
+// }
   return (
-    <Card className="card" key={product._id}>
-      <CardMedia component="img" alt={product.name} image={product.image}/>
-      {/* {console.log("product Card->", product._id)} */}
-      <CardContent>
-        <Typography gutterBottom variant="body" component="div">
-          {product.name}
-        </Typography>
-        <Typography gutterBottom variant="body" component="div" color="text.primary">
-          ${product.cost}
-        </Typography>
-        <Rating name="half-rating-read" defaultValue={product.rating} precision={0.5} readOnly />
-      </CardContent>
-
-      <CardActions>
-        <Button size="small" variant="contained" fullWidth className="card-button" onClick={()=>handleAddToCart(product)}>ADD TO CART</Button>
-      </CardActions>
-      
+    <Card  className="card" sx={{maxWidth:385}}>
+      <CardActionArea>
+              <CardMedia
+                component="img"
+                height="240"
+                image={image}
+                alt={name}
+              />
+              <CardContent>
+                <Typography gutterBottom variant="h5" component="div">
+                 {name}
+                </Typography>
+                <Typography gutterBottom variant="h6" component="div">
+                 ${cost}
+                </Typography>
+                <Rating name="read-only" value={rating} readOnly />
+              </CardContent>
+            </CardActionArea>
+            <CardActions>
+              <Button size="" fullWidth color="primary" variant="contained" value={_id} onClick={handleAddToCart}>
+              <AddShoppingCartOutlined />  ADD TO CART
+              </Button>
+            </CardActions>
     </Card>
   );
 };

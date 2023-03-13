@@ -1,20 +1,18 @@
 import {
   AddOutlined,
   RemoveOutlined,
-  ShoppingCart,
   ShoppingCartOutlined,
 } from "@mui/icons-material";
 import { Button, IconButton, Stack } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory} from "react-router-dom";
 import "./Cart.css";
-import { useState } from "react";
 
 // Definition of Data Structures used
 /**
  * @typedef {Object} Product - Data on product available to buy
- *
+ * 
  * @property {string} name - The name or title of the product
  * @property {string} category - The category that the product belongs to
  * @property {number} cost - The price to buy the product
@@ -25,7 +23,7 @@ import { useState } from "react";
 
 /**
  * @typedef {Object} CartItem -  - Data on product added to cart
- *
+ * 
  * @property {string} name - The name or title of the product in cart
  * @property {string} qty - The quantity of product added to cart
  * @property {string} category - The category that the product belongs to
@@ -40,7 +38,7 @@ import { useState } from "react";
  *
  * @param { Array.<{ productId: String, qty: Number }> } cartData
  *    Array of objects with productId and quantity of products in cart
- *
+ * 
  * @param { Array.<Product> } productsData
  *    Array of objects with complete data on all available products
  *
@@ -49,25 +47,27 @@ import { useState } from "react";
  *
  */
 export const generateCartItemsFrom = (cartData, productsData) => {
-  // console.log("cart in CART.js->", productsData);
-  if (!cartData.length || !productsData.length) {
-    return;
-  }
-  const cartItems = [];
-  const products = productsData;
-  console.log("products", products)
-  cartData.forEach((data) => {
-    const product = products.filter((product) => {
-      return product._id === data.productId;
-    });
-    // console.log(data)
-    const details = {
-      ...data,
-      ...product[0],
-    };
-    cartItems.push(details);
-  });
-  return cartItems;
+  // console.log(cartData)
+    let map=new Map();
+    for(let i=0;i<productsData.length;i++){
+      map.set(productsData[i]["_id"],productsData[i]);
+    }
+    let cartItems=[];
+    
+
+    cartData.forEach((x)=>{
+      let value=map.get(x['productId']);
+      value["quantity"]=x.qty;
+      cartItems.push(value)
+    })
+
+    // for(let i=0;i<cartData.length;i++){
+    //   let value=map.get(cartData[i]["productId"]);
+    //   value["quantity"]=cartData[i].qty;
+    //   console.log(value)
+    //   cartItems.push(value)
+    // }
+    return cartItems;
 };
 
 /**
@@ -82,103 +82,22 @@ export const generateCartItemsFrom = (cartData, productsData) => {
  */
 export const getTotalCartValue = (items = []) => {
 
-  let total = 0;
-  if (items.length > 0) {
-    for (let i = 0; i < items.length; i++) {
-      total += items[i].cost * items[i].qty;
-    }
+  let value=0;
+  for(let i=0;i<items.length;i++){
+    value+=items[i].quantity*items[i].cost;
   }
-  return total;
+return value;
+
 };
 
-/**
- * Component to display the current quantity for a product and + and - buttons to update product quantity on cart
- *
- * @param {Number} value
- *    Current quantity of product in cart
- *
- * @param {Function} handleAdd
- *    Handler function which adds 1 more of a product to cart
- *
- * @param {Function} handleDelete
- *    Handler function which reduces the quantity of a product in cart by 1
- *
- *
- */
+export const getTotalItems=(items=[])=>{
+  let qty=0;
+  for(let i=0;i<items.length;i++){
+    qty+=items[i].quantity;
+  }
+  return  qty;
+}
 
-
-// TODO: CRIO_TASK_MODULE_CHECKOUT - Implement function to return total cart quantity
-/**
- * Return the sum of quantities of all products added to the cart
- *
- * @param { Array.<CartItem> } items
- *    Array of objects with complete data on products in cart
- *
- * @returns { Number }
- *    Total quantity of products added to the cart
- *
- */
-const GetTotalItems = (items = [], readOnly) => {
-
-  let ShippingCharge = 0;
-  let subTotal = getTotalCartValue(items.items)
-  let total = ShippingCharge + subTotal
-
-  return (
-    <>
-      {readOnly === true && (
-
-
-        <Box padding="1rem">
-          <h3>Order Details</h3>
-          <Stack direction="column" alignItems="center"  >
-            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-              <Box paddingBottom="1rem">
-                Products
-          </Box>
-              <Box paddingBottom="1rem">
-                {items.items.length}
-              </Box>
-            </Box>
-
-            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-              <Box paddingBottom="1rem">
-                Sub Total
-        </Box>
-              <Box paddingBottom="1rem">
-                {subTotal}
-              </Box>
-            </Box>
-
-            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-              <Box paddingBottom="1rem">
-                Shipping Charges
-        </Box>
-              <Box paddingBottom="1rem">
-                {ShippingCharge}
-              </Box>
-            </Box>
-
-            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-              <Box paddingBottom="1rem">
-                <h4>
-                  Total
-          </h4>
-              </Box>
-              <Box paddingBottom="1rem">
-                <h4>
-                  {total}
-                </h4>
-              </Box>
-            </Box>
-          </Stack>
-        </Box>
-      )}
-    </>
-  )
-};
-
-// TODO: CRIO_TASK_MODULE_CHECKOUT - Add static quantity view for Checkout page cart
 /**
  * Component to display the current quantity for a product and + and - buttons to update product quantity on cart
  * 
@@ -191,73 +110,102 @@ const GetTotalItems = (items = [], readOnly) => {
  * @param {Function} handleDelete
  *    Handler function which reduces the quantity of a product in cart by 1
  * 
- * @param {Boolean} isReadOnly
- *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  * 
  */
-const ItemQuantity = ({
-  value,
-  handleAdd,
-  handleDelete,
-  readOnly
-}) => {
+const ItemQuantity = ({value,handleAdd,handleDelete,productId}) => {
 
-  console.log("1", readOnly)
 
   return (
-    <>
-      {readOnly === false ?
-        (<Stack direction="row" alignItems="center">
-          <IconButton size="small" color="primary" onClick={handleDelete}>
-            <RemoveOutlined />
+    <Stack direction="row" alignItems="center">
+          <IconButton size="small" color="primary" onClick={(e)=>{handleDelete(productId,'-')}}>
+          <RemoveOutlined />
           </IconButton>
           <Box padding="0.5rem" data-testid="item-qty">
-            {value}
+           {value}
           </Box>
-          <IconButton size="small" color="primary" onClick={handleAdd}>
-            <AddOutlined />
+          <IconButton size="small" color="primary" onClick={(e)=>{handleAdd(productId,"handleAdd")}}>
+           <AddOutlined />
           </IconButton>
-        </Stack>)
-        :
-        (<Stack direction="row" alignItems="center">
-          <Box padding="0.5rem" data-testid="item-qty">
-            Qty: {value}
-          </Box>
-        </Stack>)
-      }
-    </>
+    </Stack>
   );
 };
 
 /**
  * Component to display the Cart view
- *
+ * 
  * @param { Array.<Product> } products
  *    Array of objects with complete data of all available products
- *
+ * 
  * @param { Array.<Product> } items
  *    Array of objects with complete data on products in cart
- *
+ * 
  * @param {Function} handleDelete
  *    Current quantity of product in cart
- *
- *
+ * 
+ * 
  */
 
-const Cart = ({ isReadOnly = false, products, items = [], handleQuantity }) => {
 
-  // const [readOnly, setReadOnly] = useState("");
-  console.log("readOnly===>>", items);
+function DisplayCartItems(props){
+  const {image,name,cost,quantity,"_id":id}=props.items;
+  
+  return (
+    
+    <Box display="flex" alignItems="flex-start" padding="1rem">
+        <Box className="image-container">
+            <img
+                // Add product image
+                src={image}
+                // Add product name as alt eext
+                alt={name}
+                width="100%"
+                height="100%"
+            />
+        </Box>
+        <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="space-between"
+            height="6rem"
+            paddingX="1rem"
+        >
+            <div>{name}</div>
+            {/* Add product name */}
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+            >
+              {
+                !props.isReadOnly?
+                    <ItemQuantity
+                    value={quantity}
+                    handleAdd={props.buttonClick}
+                    handleDelete={props.buttonClick}
+                    productId={id}
+                  // Add required props by checking implementation
+                  />
+                  :
+                  <Box>
+                    Qty:{quantity}
+                  </Box>
+              }
+            
+            <Box padding="0.5rem" fontWeight="700">
+                ${cost}
+                {/* Add product cost */}
+            </Box>
+            </Box>
+        </Box>
+    </Box>
+  )
+}
 
-  // if(readOnly !== isReadOnly) {
-  //   setReadOnly(isReadOnly);
-  // }
 
-  const history = useHistory();
-  // {
-  //   console.log("itmea->", items);
-  // }
 
+
+const Cart = ({products,items = [],handleQuantity,isReadOnly}) => {
+ let history=useHistory();
   if (!items.length) {
     return (
       <Box className="cart empty">
@@ -271,38 +219,17 @@ const Cart = ({ isReadOnly = false, products, items = [], handleQuantity }) => {
 
   return (
     <>
-      <Box className="cart">
+      <Box className="cart" >
         {/* TODO: CRIO_TASK_MODULE_CART - Display view for each cart item with non-zero quantity */}
 
-        {items.map((item) => (
-          <Box display="flex" alignItems="flex-start" padding="1rem" key={item._id}>
-            <Box className="image-container">
-
-              <img
-                // Add product image
-                src={item.image}
-                // Add product name as alt eext
-                alt={item.name}
-                width="100%"
-                height="100%"
-              />
-            </Box>
-            <Box display="flex" flexDirection="column" justifyContent="space-between" height="6rem" paddingX="1rem" >
-              <div>{item.name}</div>
-              <Box display="flex" justifyContent="space-between" alignItems="center" >
-                <ItemQuantity value={item.qty}
-                  handleAdd={() => handleQuantity(item.productId, Number(item.qty) + 1)}
-                  handleDelete={() => handleQuantity(item.productId, Number(item.qty) - 1)}
-                  readOnly={isReadOnly}
-                // Add required props by checking implementation
-                />
-                <Box padding="0.5rem" fontWeight="700">
-                  ${item.cost}
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        ))}
+          {
+            items.map((values)=>{
+                 return (isReadOnly ? (<DisplayCartItems isReadOnly items={values} buttonClick={handleQuantity} key={values['_id']}/>)
+                :(<DisplayCartItems  items={values} buttonClick={handleQuantity} key={values['_id']}/>)
+              )
+            }
+            )
+          }
 
         <Box
           padding="1rem"
@@ -323,27 +250,23 @@ const Cart = ({ isReadOnly = false, products, items = [], handleQuantity }) => {
             ${getTotalCartValue(items)}
           </Box>
         </Box>
-
-        {isReadOnly === false && (
-
+        
           <Box display="flex" justifyContent="flex-end" className="cart-footer">
-            <Button
-              color="primary"
-              variant="contained"
-              startIcon={<ShoppingCart />}
-              className="checkout-btn"
-              onClick={() => {
-                history.push("/checkout");
-              }}
-            >
-              Checkout
-          </Button>
-          </Box>
-        )}
-      </Box>
-      <Box className="cart">
-        <GetTotalItems items={items} readOnly={isReadOnly} />
-        {/* hello */}
+            {
+              // console.log(window.location.pathname)
+              window.location.pathname==="/checkout"?
+                  <></>
+                  :
+                  <Button
+                  color="primary"
+                  variant="contained"
+                  onClick={(e)=>{history.push('/checkout')}}
+                  className="checkout-btn"
+                  >
+                  Checkout
+                  </Button>
+            }
+          </Box>  
       </Box>
     </>
   );

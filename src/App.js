@@ -1,26 +1,36 @@
 import Register from "./components/Register";
-// import ipConfig from "./ipConfig.json";
-import { Route, Switch } from "react-router-dom";
+import Product from "./components/Products";
 import Login from "./components/Login";
-import Products from "./components/Products";
 import Checkout from "./components/Checkout";
-import Thanks from "./components/Thanks"
+import Thanks from './components/Thanks'
+import {Switch,Route} from "react-router-dom";
 
 export const config = {
-  endpoint: `https://qkart-frontend-i0kb.onrender.com/api/v1`,
- 
+  endpoint: `https://qkart-frontend-10h6.onrender.com/api/v1`,
 };
 
 function App() {
   return (
     <div className="App">
+  
         <Switch>
-        <Route path="/checkout" component={Checkout} />
-        <Route path="/register" component={Register} />
-        <Route path="/login" component={Login} />
-        <Route path="/" component={Products} />
-        <Route path="/thanks" component={Thanks} />
-      </Switch>
+            <Route  path="/register">
+             <Register />
+            </Route>
+            <Route  path="/login">
+              <Login />
+            </Route>   
+            <Route  path="/checkout">
+             <Checkout /> 
+            </Route>
+            <Route  path="/Thanks">
+             <Thanks /> 
+            </Route>
+            <Route  path="/">
+             <Product /> 
+            </Route>
+        </Switch>
+  
     </div>
   );
 }

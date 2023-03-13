@@ -1,87 +1,55 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Avatar, Button, Stack } from "@mui/material";
+import {useHistory} from 'react-router-dom';
 import Box from "@mui/material/Box";
 import React from "react";
 import "./Header.css";
-import { useHistory, Link } from "react-router-dom";
 
 const Header = ({ children, hasHiddenAuthButtons }) => {
-  const history = useHistory();
-  const user = localStorage.getItem("username");
-  const isLogIn = user ? true : false;
+  let history=useHistory();
+  
+  let userName=localStorage.getItem("username");
 
-  const loggingOut = () => {
-    localStorage.clear();
-    history.push("/");
-    // window.location.reload();
-  };
 
-  return (
-    <Box className="header">
-      <Box
-        className="header-title"
-        onClick={() => {
-          history.push("/");
-        }}
-      >
-        <img src="logo_light.svg" alt="QKart-icon"></img>
-      </Box>
+const clear=()=>{
+  localStorage.clear();
+  window.location.reload();
+}
 
-      {/* the children here signifies the textfield from line no. 163 ,that header returns as child in the product.js file
-    this states that => this.props.children */}
-      {children}
 
-      {hasHiddenAuthButtons && (
+    return (
+      <Box className="header">
+      <Box className="header-title">
+            <img src="logo_light.svg" alt="QKart-icon"></img>
+        </Box>
+        {children}
+      {hasHiddenAuthButtons?(
         <Button
           className="explore-button"
           startIcon={<ArrowBackIcon />}
           variant="text"
-          onClick={() => {
-            history.push("/");
-          }}
+          onClick={(e)=>{history.push("/")}}
         >
           Back to explore
         </Button>
-      )}
-
-      {isLogIn && (
-        <Stack direction="row" justifyContent="center" alignItems="center">
-          <div
-            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-            onClick={() => {
-              history.push("/checkout");
-            }}
-          >
-            <Avatar alt={user} src="avatar.png" />
-            <div>{localStorage.getItem("username")}</div>
-          </div>
-          <Button variant="text" onClick={loggingOut}>
-            logout
-          </Button>
-        </Stack>
-      )}
-
-      {!isLogIn && !hasHiddenAuthButtons && (
-        <Stack direction="row">
-          <Button
-            onClick={() => {
-              history.push("/login");
-            }}
-          >
-            login
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              history.push("/register");
-            }}
-          >
-            register
-          </Button>
-        </Stack>
-      )}
-    </Box>
-  );
+      ):(userName?(
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar alt={userName}  src="/public/avatar.png" />
+          <p> {userName}</p>
+          <Button  variant="contained"
+          onClick={clear}
+          >LOGOUT</Button></Stack>
+        ):(
+          <Stack direction="row" spacing={2}>
+            <Button  variant="contained"
+              onClick={(e)=>{history.push("/login")}}
+            >LOGIN</Button>
+          <Button  variant="contained" onClick={(e)=>{history.push("/register")}}>REGISTER</Button>
+          </Stack>)
+          )}
+     </Box>
+     
+    );
 };
 
 export default Header;
