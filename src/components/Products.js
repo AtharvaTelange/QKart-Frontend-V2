@@ -3,14 +3,13 @@ import { Search, SentimentDissatisfied } from "@mui/icons-material";
 import {
   CircularProgress,
   Grid,
-
   InputAdornment,
   TextField,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
 import { useSnackbar } from "notistack";
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { config } from "../App";
 import Footer from "./Footer";
 import Header from "./Header";
@@ -32,7 +31,7 @@ import Cart,{generateCartItemsFrom} from "./Cart";
 
 
 const Products = () => {
-  const { enqueueSnackbar, } = useSnackbar();
+  const { enqueueSnackbar} = useSnackbar();
   const [productData,updateProduct]=useState([]);
   const [isFetching,updateFecthed]=useState(false);
   const [productNotFound,updateProductNotFound]=useState(false);
@@ -146,7 +145,9 @@ const Products = () => {
     async function onLoad(){
        const product=await performAPICall();
       let user=localStorage.getItem('username');
-      if (user && updateUserLoggedIn(true)){ 
+      if(user){
+        updateUserLoggedIn(true)
+      } 
       let token=localStorage.getItem('token');
       if(token){
         updateUserToken(token);
@@ -156,7 +157,6 @@ const Products = () => {
         const cartData=await generateCartItemsFrom(cartItems,product)
         updateCartData(cartData);
       }
-    }
     }
     onLoad();
   },[])
@@ -317,8 +317,8 @@ const addToCart = async (token, items,products,productId,qty,options = { prevent
 
 let addItems=(e)=>{
   if(!userLoggedIn){
-    enqueueSnackbar("Login to add an item to the Cart",{variant:"warning"})}
-  if(userLoggedIn){
+    enqueueSnackbar("Login to add an item to the Cart",{variant:"warning"}) }
+  else {
     let result=isItemInCart(cartData,e.target.value)
     if(!result){
       addToCart(userToken,userCartItems,productData,e.target.value,1,{preventDuplicate: true});
